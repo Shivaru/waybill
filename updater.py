@@ -11,13 +11,13 @@ def update():
                 'https://raw.github.com/Shivaru/waybill/master/Excel.py',
                 'https://raw.github.com/Shivaru/waybill/master/GetDataWialon.py',
                 'https://raw.github.com/Shivaru/waybill/master/Window.py',
-                'https://raw.github.com/Shivaru/waybill/master/GA4-C.xls',
-                'https://raw.github.com/Shivaru/waybill/master/LA.xls',
+                # 'https://raw.github.com/Shivaru/waybill/master/GA4-C.xls',
+                # 'https://raw.github.com/Shivaru/waybill/master/LA.xls',
                 'https://raw.github.com/Shivaru/waybill/master/updater.py',
                 'https://raw.github.com/Shivaru/waybill/master/main.py',
                 'https://raw.github.com/Shivaru/waybill/master/version.txt']
 
-        r = requests.get(urls[9])
+        r = requests.get(urls[-1])
         versgit = r.text
 
         path = os.getcwd()
