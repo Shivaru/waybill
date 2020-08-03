@@ -11,23 +11,20 @@ $Output = $wshell.Popup("Проверка обновления программ�
 # Проверка версии
 
 $pathversion = $PSScriptRoot + "/" + "version.txt"
+
 $currentversion = Get-Content -Path $pathversion
 $getversion = (Invoke-WebRequest -Uri 'https://raw.github.com/Shivaru/waybill/master/version.txt').content
 
 $urls = 'https://raw.github.com/Shivaru/waybill/master/README.md',
-        'https://raw.github.com/Shivaru/waybill/master/design.py',
-        'https://raw.github.com/Shivaru/waybill/master/Excel.py',
-        'https://raw.github.com/Shivaru/waybill/master/GetDataWialon.py',
-        'https://raw.github.com/Shivaru/waybill/master/Window.py',
+        #'https://raw.github.com/Shivaru/waybill/master/GetDataWialon.py',
         'https://raw.github.com/Shivaru/waybill/master/GA4-C.xls',
         'https://raw.github.com/Shivaru/waybill/master/LA.xls',
-        'https://raw.github.com/Shivaru/waybill/master/updater.py',
-        'https://raw.github.com/Shivaru/waybill/master/main.py',
+        'https://raw.github.com/Shivaru/waybill/master/main.exe',
         'https://raw.github.com/Shivaru/waybill/master/version.txt'
 
-$startpath = $PSScriptRoot + "/" + "version.txt"
+$startpath = $PSScriptRoot + "/" + "main.exe"
+$startpath1 = $PSScriptRoot + "/" + "main_old.exe"
 
-$startpath1 = $PSScriptRoot + "/" + "version1.txt"
 
 if ($currentversion -eq $getversion)
 {
@@ -40,17 +37,18 @@ else
     
     # Копируем предыдущую версию
    
-    $lsdir = ls $PSScriptRoot | where name -Like "version1.txt"     
+    $lsdir = ls $PSScriptRoot | where name -Like "main_old.exe"     
     if ($lsdir)
     {
-        #Write-Host "Копирование не требуется"        
+        Write-Host "Копирование не требуется"        
     }
     else 
     {
-        #Write-Host "Копируем" 
+        Write-Host "Копируем" 
         Copy-Item -Path $pathversion -Destination $startpath1 -Force        
     }
 
+# ОТОБРАЖЕНИЕ ЗАГРУЗКИ
     
     # Обновление файлов
    
@@ -62,7 +60,7 @@ else
             $fullname = $PSScriptRoot + "\" + $name
             $getfile = Invoke-WebRequest $link -outfile “$fullname”
         }      
-        $Output = $wshell.Popup("Программа обновлена",0,"Waybill")
+        $Output = $wshell.Popup("Программа обновлена, Запуск программы",0,"Waybill")
         & $startpath
     }
     catch 
@@ -72,6 +70,7 @@ else
     }
     
 }
+
 
 
 
