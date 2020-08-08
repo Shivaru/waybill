@@ -18,7 +18,7 @@ Function StartProgressBar
 }
 
 $Form                            = New-Object system.Windows.Forms.Form
-$Form.ClientSize                 = New-Object System.Drawing.Point(262,142)
+$Form.ClientSize                 = New-Object System.Drawing.Point(370,142)
 $Form.text                       = "Waybill installing"
 $Form.TopMost                    = $true
 
@@ -26,7 +26,7 @@ $Form.TopMost                    = $true
 $pbrTest = New-Object System.Windows.Forms.ProgressBar
 $pbrTest.Maximum = 100
 $pbrTest.Minimum = 0
-$pbrTest.width              = 222
+$pbrTest.width              = 330
 $pbrTest.height             = 26
 $pbrTest.Location = New-Object System.Drawing.Point(22,49)
 
@@ -34,9 +34,9 @@ $i = 0
 $Form.Controls.Add($pbrTest)
 
 $Label1                          = New-Object system.Windows.Forms.Label
-$Label1.text                     = "Нажми для загрузки"
+$Label1.text                     = "Нажмите Загрузить и дождитесь запуска программы"
 $Label1.AutoSize                 = $true
-$Label1.width                    = 130
+$Label1.width                    = 150
 $Label1.height                   = 10
 $Label1.location                 = New-Object System.Drawing.Point(20,21)
 $Label1.Font                     = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
@@ -44,7 +44,7 @@ $Label1.Font                     = New-Object System.Drawing.Font('Microsoft San
 
 # Button
 $btnConfirm = new-object System.Windows.Forms.Button
-$btnConfirm.Text = "Install"
+$btnConfirm.Text = "Загрузить"
 $btnConfirm.width                   = 90
 $btnConfirm.height                  = 25
 $btnConfirm.Location = New-Object System.Drawing.Point(145,92)
@@ -82,19 +82,20 @@ $btnConfirm.Add_Click({
             $Label1.Text = "Загрузка $i % Пожалуйста подождите"    
             $pbrTest.Value = $i
             Start-Sleep -m 1
-            $i += 17
+            $i += 20
         }
-        $Label1.Text = "Программа обновлена. Запуск"
-        Start-Sleep 1
-        $Form.Close()      
+        
+        $Label1.Text = "Программа обновлена. Запуск"     
         #$Output = $wshell.Popup("Программа обновлена, Запуск программы",0,"Waybill")
+        Start-Sleep 3
+        $Form.Close()
+        #& $startpath
 
-        & $startpath
     }
     catch 
     {
         $Output = $wshell.Popup("Программу неудалось обновить, запуск предыдущей версии",1,"Waybill",0)
-        & $startpath1
+        #& $startpath1
     }
 })
 
@@ -134,14 +135,13 @@ $startpath = $pathtoinstall + "\" + "main.exe"
 $oldname = "main_old"+$currentversion + ".exe"
 $startpath1 = $pathtoinstall + "\" + "$oldname"
 
-
 # Проверка версии
 
 
 if ($currentversion -eq $getversion)
 {
     $Output = $wshell.Popup("Обновления не требуется. Запуск",1,"Waybill",0)        
-    & $startpath
+    #& $startpath
 }
 else 
 {
@@ -155,7 +155,7 @@ else
         #$Output = $wshell.Popup("Копируем",1,"Waybill",0)
         try
         {
-            Copy-Item -Path $startpath -Destination $startpath1 -Force 
+            Copy-Item -Path $startpath -Destination $startpath1 -Force -ErrorAction SilentlyContinue
             Start-Sleep 2
         }
         catch 
@@ -167,3 +167,24 @@ else
     $Form.Add_Shown({$Form.Activate()})
     $Form.ShowDialog()
 }
+
+
+try
+{
+    & $startpath
+}
+catch 
+{
+    try
+    {
+        & $startpath1
+    }
+    catch 
+    {
+        $Output = $wshell.Popup("Запустить программу не удалось!
+     Проверьте соединение с интернетом, потом перезапустите программу.
+      При повторном возникновении ошибки обратитесь к системному администратору.",10,"Waybill",48)
+    }
+}
+
+
