@@ -17,21 +17,6 @@ Function StartProgressBar
 	
 }
 
-$Form0                            = New-Object system.Windows.Forms.Form
-$Form0.ClientSize                 = New-Object System.Drawing.Point(262,142)
-$Form0.text                       = "Form"
-$Form0.TopMost                    = $true
-
-$Label0                          = New-Object system.Windows.Forms.Label
-$Label0.text                     = "Проверка обновления программы"
-$Label0.AutoSize                 = $true
-$Label0.width                    = 25
-$Label0.height                   = 10
-$Label0.location                 = New-Object System.Drawing.Point(15,57)
-$Label0.Font                     = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
-
-$Form0.controls.AddRange(@($Label0))
-
 $Form                            = New-Object system.Windows.Forms.Form
 $Form.ClientSize                 = New-Object System.Drawing.Point(262,142)
 $Form.text                       = "Waybill installing"
@@ -87,7 +72,7 @@ $btnConfirm.Add_Click({
         foreach ($link in $urls)
         {
             $name = $link.split("/")[-1]
-            $fullname = $PSScriptRoot + "\" + $name
+            $fullname = $pathtoinstall + "\" + $name
             $name
             $link
             $fullname 
@@ -100,16 +85,16 @@ $btnConfirm.Add_Click({
             $i += 17
         }
         $Label1.Text = "Программа обновлена. Запуск"
-        Start-Sleep 3
+        Start-Sleep 1
         $Form.Close()      
         #$Output = $wshell.Popup("Программа обновлена, Запуск программы",0,"Waybill")
 
-        #& $startpath
+        & $startpath
     }
     catch 
     {
         $Output = $wshell.Popup("Программу неудалось обновить, запуск предыдущей версии",1,"Waybill",0)
-        #& $startpath1
+        & $startpath1
     }
 })
 
@@ -124,11 +109,18 @@ Stop-Process -Name main -Force -ErrorAction SilentlyContinue
 $wshell = New-Object -ComObject Wscript.Shell
 $Output = $wshell.Popup("Проверка обновления программы",1,"Waybill",0)
 
-# Проверка версии
 
-$pathversion = $PSScriptRoot + "/" + "version.txt"
+# Пути копирования и загрузки
 
-$currentversion = Get-Content -Path $pathversion
+
+$pathtoinstall = "C:\progra~1\waybill"
+mkdir $pathtoinstall -ErrorAction SilentlyContinue
+
+
+$pathversion = $pathtoinstall + "\" + "version.txt"
+
+$currentversion = Get-Content -Path $pathversion -ErrorAction SilentlyContinue
+
 $getversion = (Invoke-WebRequest -Uri 'https://raw.github.com/Shivaru/waybill/master/version.txt').content
 
 $urls = 'https://raw.github.com/Shivaru/waybill/master/README.md',
@@ -138,8 +130,13 @@ $urls = 'https://raw.github.com/Shivaru/waybill/master/README.md',
         'https://raw.github.com/Shivaru/waybill/master/main.exe',
         'https://raw.github.com/Shivaru/waybill/master/version.txt'
 
-$startpath = $PSScriptRoot + "/" + "main.exe"
-$startpath1 = $PSScriptRoot + "/" + "main_old.exe"
+$startpath = $pathtoinstall + "\" + "main.exe"
+$oldname = "main_old"+$currentversion + ".exe"
+$startpath1 = $pathtoinstall + "\" + "$oldname"
+
+
+# Проверка версии
+
 
 if ($currentversion -eq $getversion)
 {
@@ -148,7 +145,7 @@ if ($currentversion -eq $getversion)
 }
 else 
 {
-    $lsdir = ls $PSScriptRoot | where name -Like "main_old.exe"     
+    $lsdir = ls $pathtoinstall | where name -Like "$oldname"     
     if ($lsdir)
     {
         #$Output = $wshell.Popup("Копирование не требуется",1,"Waybill",0)          
@@ -159,6 +156,7 @@ else
         try
         {
             Copy-Item -Path $startpath -Destination $startpath1 -Force 
+            Start-Sleep 2
         }
         catch 
         {
